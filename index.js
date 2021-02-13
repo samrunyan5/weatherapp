@@ -1,3 +1,6 @@
+require('dotenv').config();
+const {PORT = 3000, WEATHER_KEY} = process.env
+
 const express = require('express');
 const server = express();
 
@@ -17,7 +20,16 @@ server.use(express.static('public'));
 const Quote = require('inspirational-quotes');
 const cowsay = require('cowsay');
 
-server.get('/', (req, res) => {
+server.get('/weather', async (req, res) => {
+    try {
+        const {lat, lon} = req.query
+        const URL = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=${WEATHER_KEY}`
+        const {data} = await axios.get(URL)
+        res.send({results:data})
+    } catch (error) {
+        res.send({error})
+    }
+
     res.send({message: 'heck'})
 });
 
@@ -30,6 +42,6 @@ server.get('/cowspiration', (req, res) => {
     res.send({cow});
 });
 
-server.listen(3000, () => {
+server.listen(PORT, () => {
     console.log(chalk.cyan('I AM WORKING!!!'))
 });
